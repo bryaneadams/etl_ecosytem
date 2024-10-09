@@ -16,6 +16,7 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    AIRFLOW__CORE__DAGS__FOLDER: '/opt/airflow/dags/repo'
     # Used for google oauth2
     GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     GOOGLE_SECRET: ${GOOGLE_SECRET}
@@ -51,7 +52,7 @@ services:
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready -U $POSTGRES_USER"]
+      test: ["CMD", "pg_isready", "-U", "$POSTGRES_USER"]
       interval: 10s
       retries: 5
       start_period: 5s
@@ -237,7 +238,22 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
-  
+  gitSync:
+    image: k8s.gcr.io/git-sync/git-sync:v3.3.0
+    environment:
+      GIT_SYNC_USERNAME: ${GIT_SYNC_USERNAME}
+      GIT_SYNC_PASSWORD: ${GIT_SYNC_PASSWORD}
+      GIT_SYNC_REV: 'HEAD'
+      GIT_SYNC_BRANCH: 'main'
+      GIT_SYNC_REPO: ${GIT_SYNC_REPO}
+      GIT_SYNC_DEPTH: 1
+      GIT_SYNC_ROOT: '/git'
+      GIT_SYNC_DEST: 'repo'
+      GIT_SYNC_ADD_USER: 'true'
+      GIT_SYNC_WAIT: '60'
+      GIT_SYNC_MAX_SYNC_FAILURES: '0'
+    volumes:
+          - ${AIRFLOW_PROJ_DIR:-.}/dags:/git
 
 volumes:
   postgres-db-volume:
