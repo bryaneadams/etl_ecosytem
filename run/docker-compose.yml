@@ -16,7 +16,8 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
-    AIRFLOW__CORE__DAGS__FOLDER: '/opt/airflow/dags/repo'
+    AIRFLOW__CORE__DAGS_FOLDER: '/opt/airflow/dags/repo'
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
     # Used for google oauth2
     GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     GOOGLE_SECRET: ${GOOGLE_SECRET}
@@ -250,7 +251,7 @@ services:
       GIT_SYNC_ROOT: '/git'
       GIT_SYNC_DEST: 'repo'
       GIT_SYNC_ADD_USER: 'true'
-      GIT_SYNC_WAIT: '60'
+      GIT_SYNC_WAIT: '600'
       GIT_SYNC_MAX_SYNC_FAILURES: '0'
     volumes:
           - ${AIRFLOW_PROJ_DIR:-.}/dags:/git
